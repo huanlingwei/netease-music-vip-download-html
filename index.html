@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>网易云VIP歌曲下载</title>
+</head>
+
+<body>
+    <div class="background">
+        <div class="box">
+            <div class="input-group">
+                <div class="input-form">
+                    <div class="input-text">网易云地址:</div> <input id="share-text" class="input" type="text" placeholder="请输入网易云地址" name="share_text">
+    
+                </div>
+                <div>
+                    <button class="btn-ana" type="submit" onclick="submit()" >解析</button>
+    
+                </div>
+                <div>
+                    <div id="result">"http://m701.music.126.net/20240105222827/c0acacbc7c9b75d2d0fa9b5d4b591c9f/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/17242136471/b7ef/ef89/6e3d/7195ae85d0db107e9428d54ba8714ed9.mp3"</div>
+                </div>
+                <div>
+                    <button class="btn-download"  onclick="googlecode()" >下载</button>
+                </div>
+            </div>
+            
+
+    </div>
+
+</body>
+
+</html>
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    html,body {
+        width: 100%;
+        height: 100%;
+    }
+
+    .background {
+        background-color: #f5f6fa;
+        width: 100%;
+        height: 100%
+    }
+
+    .box {
+        width: 80%;
+        height: 200px;
+        background-color: white;
+        border-radius: 3px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .input-group{
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+    .input-form{
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 40px;
+}
+.input-text{
+    align-items: center;
+    padding: .4375rem 1rem;
+    margin-bottom: 0;
+    font-size: .8125rem;
+    font-weight: 400;
+    line-height: 1.25rem;
+    color: #3c4d62;
+    text-align: center;
+    white-space: nowrap;
+    background-color: #ebeef2;
+    border: 1px solid #dbdfea;
+    border-radius: 4px 0 0 4px;
+    border-right: none;
+    flex: 0 0 auto;
+}
+
+.input{
+    flex: 1;
+    border-radius: 0 4px 4px 0;
+    border: 1px solid #dbdfea;
+    padding:8px
+}
+.input::placeholder{
+    font-size: 14px;
+    color: #b5b9b9;
+}
+.btn-ana,.btn-download{
+    width: 100%;
+    height: 40px;
+    border: 1px solid #09c2de;
+    background-color: #e4f8fb;
+    color: #09c2de;
+    font-size: 14px;
+    font-family: 宋体,微软雅黑;
+    font-weight: 700;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+#result{
+    height: 40px;
+    overflow-wrap: break-word;
+}
+
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> 
+<!-- <script src="https://unpkg.com/@otplib/preset-browser@^12.0.0/buffer.js"></script>
+<script src="https://unpkg.com/@otplib/preset-browser@^12.0.0/index.js"></script> -->
+<script src="./modules/buffer.js"></script>
+<script src="./modules/index.js"></script>
+
+<script>
+    
+    function submit(){
+        var input = document.getElementById("share-text").value;
+        console.log(input)
+
+    const url = 'http://127.0.0.1:5000/get_song_url'
+    // const url = 'https://neteasedownload-neteasedownload-javkwubrff.cn-hangzhou.fcapp.run/get_song_url'
+
+    axios.get(url,{
+            params:{
+                'share_text':input,
+                // 'code':googlecode()
+            }
+        }).then(res=>{
+        console.log(res);
+        document.getElementById('result').innerText = JSON.stringify(res.data);
+    }).catch()
+
+    }
+
+    function download(){
+        var info=document.getElementById('result').innerText
+        var json_info=JSON.parse(info)
+        console.log(json_info)
+        var url=json_info.song_url
+        var song_artist=json_info.song_artist
+        var song_name=json_info.song_name
+        axios({
+            // url: "http://m701.music.126.net/20240105222827/c0acacbc7c9b75d2d0fa9b5d4b591c9f/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/17242136471/b7ef/ef89/6e3d/7195ae85d0db107e9428d54ba8714ed9.mp3",
+            url:url,
+            method: 'GET',
+            responseType: 'blob', // 设置响应类型为blob
+            })
+            .then(response => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download =song_name+'-'+song_artist+ '.mp3';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            })
+            .catch(error => console.error('下载文件时出错：', error));
+    }
+
+
+    function googlecode(){
+
+        otplib.authenticator.options = { digits: 6 };
+        const secret = 'TRYFXXXYXBQTGOEN'; // 由谷歌验证器生成并提供的密钥
+        const token = otplib.authenticator.generate(secret);
+
+        console.log(token); 
+        return token;
+
+    }
+
+
+
+
+
+
+
+
+
+
+</script>
